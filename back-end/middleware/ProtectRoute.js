@@ -4,8 +4,10 @@ import jwt from 'jsonwebtoken';
 
 export const ProtectRoute = async(req, res, next) => {
   try {
-
-    const {token} = req.cookies;
+    
+    const token = req.cookies.jwt;
+    
+    
     if(!token){
       return next(new ErrorHandler("token not found", 404))
     }

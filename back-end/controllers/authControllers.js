@@ -4,6 +4,8 @@ import UserModel from '../models/user.model.js'
 import bcrypt from 'bcryptjs';
 import genTokenAndsetCookies from '../utils/genToken.js';
 
+
+
 const UserSignup = catchAsyncError(async ( req, res, next ) => {
 
     const {fullName, username, password, confirmPassword, gender} = req.body
@@ -44,19 +46,24 @@ const UserSignup = catchAsyncError(async ( req, res, next ) => {
 
       return res.status(201).json({user: newUser})
     } else {
-      return new ErrorHandler("invalid user data", 404)
+      return next(new ErrorHandler("invalid user data", 404));
     }
-}) ;
+});
 
 const userLogin = catchAsyncError(async (req, res, next) => {
 
+  
   const {username, password} = req.body;
 
-  let user = await UserModel.findOne({username})
+  let user = await UserModel.findOne({username});
+  
+  if(!user){
+    return next(new ErrorHandler("username or password invalid", 404));
+  }
   
   const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
-  if( !user || !isPasswordCorrect ){
+  if(!isPasswordCorrect){
     return next(new ErrorHandler("username or password invalid", 404))
   }
 
@@ -64,14 +71,20 @@ const userLogin = catchAsyncError(async (req, res, next) => {
 
   genTokenAndsetCookies(user._id, res);
 
-  return res.status(200)
+  
+  return res
+  .status(200)
   .json({user});
 
 
 });
 
 const userLogout = catchAsyncError(async (req, res, next) => {
-      res.cookie("token", "", {maxAge: 0});
+
+      res.clearCookie("jwt", {
+         path: '/',
+         maxAge: 0
+        });
 
       return res.status(200)
       .json({message: "user logged out successfully"})

@@ -5,6 +5,6 @@ import { ProtectRoute } from '../middleware/ProtectRoute.js';
 
 const route = Router();
 
-route.get("/", ProtectRoute ,getUsers);
+route.get("/getall", ProtectRoute ,getUsers);
 
 export default route;

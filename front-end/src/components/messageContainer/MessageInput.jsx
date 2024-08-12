@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import { BsSend } from "react-icons/bs";
+import useSendMessages from '../../hooks/useSendMessages';
 
 const MessageInput = () => {
 
-  const [message, setMessage] = useState();
-  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  
+	const {loading, sendMessage} = useSendMessages();
 
-  const handleSubmit = () => {
-
+  const handleSubmit = async(e) => {
+		e.preventDefault();
+		if(!message) return;
+		await sendMessage(message);
+		setMessage("");
   }
   return (
     <form className='px-4 my-3' onSubmit={handleSubmit}>

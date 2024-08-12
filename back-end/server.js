@@ -1,16 +1,27 @@
 import express from 'express'
-import { configDotenv } from 'dotenv';
+import 'dotenv/config'
 import {connectToDB} from './db/ConnectToDB.js'
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
+import {app, server} from '../back-end/socket/socket.js'
 
-configDotenv();
+connectToDB();
+// configDotenv();
 
-const app = express();
 const PORT = process.env.PORT || 5000
 
-app.use(express.json());
 
+app.use(express.json());
 app.use(cookieParser());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+ 
+}));
+app.use(express.urlencoded({ extended: false }));
+
+
+
 
 
 import authRouter from './routes/authRoutes.js';
@@ -28,7 +39,6 @@ app.use(notFound);
 app.use(errorMiddleware);
 
 
-app.listen(PORT, () => {
-  connectToDB();
+server.listen(PORT, () => {
   console.log(`server is running on ${PORT}`)
 })
